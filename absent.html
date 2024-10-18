@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leave</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+        input {
+            margin: 10px 0; /* Spacing above and below inputs/buttons */
+            padding: 10px;
+            width: 100%; /* Full width */
+            border: 1px solid #ccc; /* Light gray border */
+            border-radius: 4px; /* Rounded input corners */
+            box-sizing: border-box; /* Include padding/border in element's total width/height */
+        }
+        button {
+            background-color: #525457;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 7px;
+            border-radius: 4px;
+            width: 100%;
+            margin-top: 5px; /* Space between buttons */
+        }
+        button:hover {
+            background-color: #272828;
+        }
+        img.logo {
+            width: 100px; /* Adjust logo width */
+            height: auto; /* Maintain aspect ratio */
+            margin-bottom: 20px; /* Spacing below logo */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="logo.png" alt="Logo" class="logo">
+        <h1>Mark Absent</h1>
+        <input type="text" id="codeInput" placeholder="Enter your code">
+        <button onclick="markAbsent()">Logout Today!</button>
+        <button id="nfcButton">Scan NFC</button> <!-- NFC Button -->
+        <button onclick="location.href='index.html'">Home</button> <!-- Home Button -->
+    </div>
+
+    <script>
+        function markAbsent() {
+            const code = document.getElementById('codeInput').value;
+
+            if (!code) {
+                alert('Please enter your code.');
+                return;
+            }
+
+            const profileData = JSON.parse(localStorage.getItem(code));
+
+            if (profileData) {
+                profileData.present = false; // Update present status to false
+                localStorage.setItem(code, JSON.stringify(profileData)); // Save updated profile
+                alert('You have been marked absent.'); // Confirmation message
+                window.location.href = 'index.html'; // Redirect back to index
+            } else {
+                alert('Invalid code. Please try again.'); // Invalid code message
+            }
+        }
+
+        // Function to scan NFC tag
+        async function scanNFC() {
+            try {
+                const nfc = new NDEFReader();
+                await nfc.scan(); // Start NFC scan
+                alert("Tap an NFC tag to scan.");
+
+                nfc.addEventListener("NDEFReader.onreading", ({ message }) => {
+                    for (const record of message.records) {
+                        const code = new TextDecoder().decode(record.data); // Decode NFC data
+                        document.getElementById('codeInput').value = code; // Set input with scanned code
+                        markAbsent(); // Call markAbsent function directly after scanning
+                    }
+                });
+            } catch (error) {
+                console.error(error);
+                alert("Error reading NFC: " + error);
+            }
+        }
+
+        // Add event listener to the NFC button
+        document.getElementById('nfcButton').onclick = scanNFC; // Assign scan function to NFC button
+    </script>
+</body>
+</html>
