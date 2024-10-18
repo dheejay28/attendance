@@ -89,7 +89,7 @@
                     profileItem.className = 'profile';
                     profileItem.innerHTML = `
                         <img src="${profileData.picture}" alt="Profile Picture">
-                        <strong>${profileData.name}</strong> (Code: ${key})
+                        <strong>${profileData.name}</strong> ${key}
                         <button onclick="removeProfile('${key}')">Remove</button>
                     `;
                     profileList.appendChild(profileItem); // Append to the profile list
